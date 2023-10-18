@@ -4,7 +4,10 @@
 // Sets up the random generator by calling srand(time(NULL)).
 void rand_init();
 
-// Returns a random unsigned long number generated in the range [0, range_end).
+/*
+ * Returns a random unsigned long number generated in the range [0, range_end).
+ * In case of any error, 'range_end' is returned.
+ */
 unsigned long get_rand(const unsigned int range_end);
 
 // Returns an array of length 'times' of unsigned long numbers generated in the range [0, range_end).
