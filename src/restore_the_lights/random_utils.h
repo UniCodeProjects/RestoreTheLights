@@ -1,6 +1,9 @@
 #ifndef RANDOM_UTILS_H_
 #define RANDOM_UTILS_H_
 
+// Sets up the random generator by calling srand(time(NULL)).
+void rand_init();
+
 // Returns a random unsigned long number generated in the range [0, range_end).
 unsigned long get_rand(const unsigned int range_end);
 
