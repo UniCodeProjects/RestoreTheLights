@@ -1,5 +1,4 @@
 #include "macros.h"
-#include "difficulty.h"
 
 // int current;
 
