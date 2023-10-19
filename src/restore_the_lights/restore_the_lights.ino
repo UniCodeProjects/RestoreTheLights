@@ -17,6 +17,11 @@ enum pins {
 const int leds[NUM_LEDS] = {GAME_LED_1, GAME_LED_2, GAME_LED_3, GAME_LED_4, STATUS_LED};
 const int buttons[NUM_BUTTONS] = {BUTTON_1, BUTTON_2, BUTTON_3, BUTTON_4};
 
+// The leds' turning on delta time.
+float t_led;
+// The available delta time to press the buttons.
+float t_btn;
+
 void setup() {
   for(int i = 0; i < NUM_LEDS; i++) {
     pinMode(leds[i], OUTPUT);
