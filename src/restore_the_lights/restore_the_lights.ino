@@ -1,18 +1,11 @@
 #include "macros.h"
+#include "difficulty.h"
+#include <EnableInterrupt.h>
 
-// int current;
+#define EI_ARDUINO_INTERRUPTED_PIN
+// #define CIRCUIT_SAMPLE
 
-enum pins {
-  GAME_LED_4 = 9,
-  GAME_LED_3,
-  GAME_LED_2,
-  GAME_LED_1,
-  BUTTON_4 = 2,
-  BUTTON_3,
-  BUTTON_2,
-  BUTTON_1,
-  STATUS_LED,
-} pins;
+int current;
 
 const int leds[NUM_LEDS] = {GAME_LED_1, GAME_LED_2, GAME_LED_3, GAME_LED_4, STATUS_LED};
 const int buttons[NUM_BUTTONS] = {BUTTON_1, BUTTON_2, BUTTON_3, BUTTON_4};
@@ -28,7 +21,8 @@ void setup() {
 }
 
 void loop() {
-  /*
+  choose_difficulty();
+  #ifdef CIRCUIT_SAMPLE
   int buttonState1 = digitalRead(BUTTON_1);
   int buttonState2 = digitalRead(BUTTON_2);
   int buttonState3 = digitalRead(BUTTON_3);
@@ -62,5 +56,5 @@ void loop() {
     current = newValue;
     Serial.println(current);
  }
- */
+ #endif
 }
