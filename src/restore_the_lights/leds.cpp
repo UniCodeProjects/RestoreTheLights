@@ -16,7 +16,7 @@ unsigned long prev_ms_2 = 0;
 
 // Utility functions declarations.
 #ifdef ARDUINO_UNO
-bool is_pwd(const uint8_t pin);
+bool is_pwm(const uint8_t pin);
 #endif
 
 /********************************************************************/
@@ -26,11 +26,13 @@ bool is_pwd(const uint8_t pin);
 /********************************************************************/
 
 void led_on(const uint8_t pin) {
+  assert(led_state == LOW);
   digitalWrite(pin, HIGH);
   led_state = HIGH;
 }
 
 void led_off(const uint8_t pin) {
+  assert(led_state == HIGH);
   digitalWrite(pin, LOW);
   led_state = LOW;
 }
@@ -51,7 +53,7 @@ void led_blink(const uint8_t pin, const unsigned long delay_ms) {
 
 void led_fade(const uint8_t pin, const unsigned long delay_ms) {
 #ifdef ARDUINO_UNO
-  assert(is_pwd(pin));
+  assert(is_pwm(pin));
 #endif
   // Without delay (busy-waiting).
   const unsigned long current_ms = millis();
@@ -68,10 +70,10 @@ void led_fade(const uint8_t pin, const unsigned long delay_ms) {
 
 // Utility functions.
 #ifdef ARDUINO_UNO
-bool is_pwd(const uint8_t pin) {
-  const uint8_t pwd_pins_arduino_uno[6] = {3, 5, 6, 9, 10, 11};
-  for (uint8_t i = 0; i < sizeof(pwd_pins_arduino_uno); i++) {
-    if (pin == pwd_pins_arduino_uno[i]) {
+bool is_pwm(const uint8_t pin) {
+  const uint8_t pwm_pins_arduino_uno[6] = {3, 5, 6, 9, 10, 11};
+  for (uint8_t i = 0; i < sizeof(pwm_pins_arduino_uno); i++) {
+    if (pin == pwm_pins_arduino_uno[i]) {
       return true;
     }
   }
