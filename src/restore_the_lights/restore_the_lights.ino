@@ -1,6 +1,5 @@
 #include "macros.h"
-
-// #define POT_PIN A0
+#include "difficulty.h"
 
 // int current;
 
@@ -9,11 +8,11 @@ enum pins {
   GAME_LED_3,
   GAME_LED_2,
   GAME_LED_1,
-  STATUS_LED,
   BUTTON_4 = 2,
   BUTTON_3,
   BUTTON_2,
-  BUTTON_1
+  BUTTON_1,
+  STATUS_LED,
 } pins;
 
 const int leds[NUM_LEDS] = {GAME_LED_1, GAME_LED_2, GAME_LED_3, GAME_LED_4, STATUS_LED};
