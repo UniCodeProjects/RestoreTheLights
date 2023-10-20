@@ -1,6 +1,9 @@
 #include "macros.h"
 #include "difficulty.h"
 
+#define EI_NOTPORTC
+#define EI_NOTPORTB
+#define EI_NOTEXTERNAL
 #define EI_ARDUINO_INTERRUPTED_PIN
 
 #include <EnableInterrupt.h>
@@ -11,7 +14,7 @@
 int current;
 #endif
 
-const int leds[NUM_LEDS] = {GAME_LED_1, GAME_LED_2, GAME_LED_3, GAME_LED_4, STATUS_LED};
+const int game_leds[NUM_GAME_LEDS] = {GAME_LED_1, GAME_LED_2, GAME_LED_3, GAME_LED_4};
 const int buttons[NUM_BUTTONS] = {BUTTON_1, BUTTON_2, BUTTON_3, BUTTON_4};
 
 // The leds' turning on delta time.
@@ -23,8 +26,8 @@ static bool is_interrupt_detached;
 float game_factor;
 
 void setup() {
-  for(int i = 0; i < NUM_LEDS; i++) {
-    pinMode(leds[i], OUTPUT);
+  for(int i = 0; i < NUM_GAME_LEDS; i++) {
+    pinMode(game_leds[i], OUTPUT);
   }
   for(int i = 0; i < NUM_BUTTONS; i++) {
     pinMode(buttons[i], INPUT);

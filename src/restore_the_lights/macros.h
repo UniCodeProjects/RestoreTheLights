@@ -2,7 +2,7 @@
 #define MACROS_H
 
 #define POT_PIN A0
-#define NUM_LEDS 5
+#define NUM_GAME_LEDS 4
 #define NUM_BUTTONS 4
 
 enum pins {
