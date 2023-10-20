@@ -16,12 +16,10 @@ void view_difficulties();
 // Returns the difficulty corresponding to the provided value
 uint8_t get_difficulty(const uint16_t value);
 
-// Returns the name of the provided difficulty
-// char* get_difficulty_name(const unsigned int difficulty_value);
-
 // Returns the factor of the provided difficulty
 float get_difficulty_factor(const uint8_t difficulty);
 
+// Returns the difficulty chosen by the user
 uint8_t get_chosen_difficulty();
 
 #endif

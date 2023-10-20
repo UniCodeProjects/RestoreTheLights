@@ -90,7 +90,7 @@ void view_difficulties() {
   int current_value = analogRead(POT_PIN);
   uint8_t actual_difficulty = get_difficulty(current_value);
   if (current_difficulty != actual_difficulty) {
-    if (current_difficulty != 0) { // at the beginning of the game the difficulty is 0
+    if (current_difficulty != 0) { // current_difficulty is 0 the first time that this method is called
       led_off(get_corresponding_led(current_difficulty));
     }
     led_on(get_corresponding_led(actual_difficulty));
