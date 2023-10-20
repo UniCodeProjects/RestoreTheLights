@@ -1,3 +1,4 @@
+#include <math.h>
 #include <assert.h>
 #include "level.h"
 
@@ -6,8 +7,8 @@
 
 extern float game_factor;
 
-extern float t_led;
-extern float t_btn;
+extern unsigned long t_led;
+extern unsigned long t_btn;
 
 static bool led_reached_threshold = false;
 static bool btn_reached_threshold = false;
@@ -22,7 +23,7 @@ void next_level() {
         t_btn = BTN_THRESHOLD_MS;
         btn_reached_threshold = true;
     } else {
-        t_led *= game_factor;
-        t_btn *= game_factor;
+        t_led = abs(lround(t_led * game_factor));
+        t_btn = abs(lround(t_btn * game_factor));
     }
 }
