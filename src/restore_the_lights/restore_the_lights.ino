@@ -1,6 +1,10 @@
 #include "macros.h"
 #include "difficulty.h"
 
+#define EI_ARDUINO_INTERRUPTED_PIN
+
+#include <EnableInterrupt.h>
+
 // #define CIRCUIT_SAMPLE
 
 #ifdef CIRCUIT_SAMPLE
@@ -23,8 +27,10 @@ void setup() {
   }
   is_difficulty_chosen = false;
   is_interrupt_detached = false;
+  
   Serial.begin(9600);
-  attachInterrupt(digitalPinToInterrupt(BUTTON_4), choose_difficulty, RISING);
+
+  enableInterrupt(BUTTON_1, choose_difficulty, RISING);
 }
 
 void loop() {
@@ -33,7 +39,7 @@ void loop() {
   }
   else {
     if (!is_interrupt_detached) {
-      detachInterrupt(digitalPinToInterrupt(BUTTON_4));
+      disableInterrupt(BUTTON_1);
       is_interrupt_detached = true;
     }
     Serial.println("Chosen game factor: " + String(game_factor));
