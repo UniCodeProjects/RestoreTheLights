@@ -11,9 +11,9 @@ const int leds[NUM_LEDS] = {GAME_LED_1, GAME_LED_2, GAME_LED_3, GAME_LED_4, STAT
 const int buttons[NUM_BUTTONS] = {BUTTON_1, BUTTON_2, BUTTON_3, BUTTON_4};
 
 // The leds' turning on delta time.
-float t_led = 3000;
+unsigned long t_led = 3000;
 // The available delta time to press the buttons.
-float t_btn = 15000;
+unsigned long t_btn = 15000;
 static bool is_difficulty_chosen;
 static bool is_interrupt_detached;
 float game_factor;
