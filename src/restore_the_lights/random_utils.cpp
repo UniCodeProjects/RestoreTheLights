@@ -32,7 +32,7 @@ static unsigned long *generate_array(const uint8_t size) {
     return NULL;
   }
   for (uint8_t i = 0; i < size; i++) {
-    array[i] = i + 1;
+    array[i] = i;
   }
   return array;
 }
