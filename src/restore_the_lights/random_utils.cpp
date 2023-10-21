@@ -1,7 +1,6 @@
 #include <time.h>
 #include <stdlib.h>
 #include <inttypes.h>
-#include <assert.h>
 #include "random_utils.h"
 #include "Arduino.h"
 
@@ -29,6 +28,9 @@ static void shuffle(unsigned long array[], uint8_t n) {
 
 static unsigned long *generate_array(const uint8_t size) {
   unsigned long *array = (unsigned long *) malloc(size);
+  if (array == NULL) {
+    return NULL;
+  }
   for (uint8_t i = 0; i < size; i++) {
     array[i] = i + 1;
   }
