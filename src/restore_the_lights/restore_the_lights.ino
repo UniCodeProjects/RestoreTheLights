@@ -1,6 +1,8 @@
 #include "macros.h"
 #include "difficulty.h"
 #include "leds.h"
+#include "random_utils.h"
+#include "leds.h"
 
 #define EI_NOTPORTC
 #define EI_NOTPORTB
@@ -8,12 +10,6 @@
 #define EI_ARDUINO_INTERRUPTED_PIN
 
 #include <EnableInterrupt.h>
-
-// #define CIRCUIT_SAMPLE
-
-#ifdef CIRCUIT_SAMPLE
-int current;
-#endif
 
 const int game_leds[NUM_GAME_LEDS] = {GAME_LED_1, GAME_LED_2, GAME_LED_3, GAME_LED_4};
 const int buttons[NUM_BUTTONS] = {BUTTON_1, BUTTON_2, BUTTON_3, BUTTON_4};
@@ -25,6 +21,16 @@ unsigned long t_btn = 15000;
 static bool is_difficulty_chosen;
 static bool is_interrupt_detached;
 float game_factor;
+
+static bool game_started;
+
+static void start_game() {
+  led_off(STATUS_LED);
+  game_started = true;
+  disableInterrupt(BUTTON_1);
+  enableInterrupt(BUTTON_1, choose_difficulty, RISING);
+  Serial.println("Choose difficulty:");
+}
 
 static void choose_difficulty() {
   is_difficulty_chosen = true;
@@ -42,56 +48,43 @@ void setup() {
   }
   is_difficulty_chosen = false;
   is_interrupt_detached = false;
-  
-  Serial.begin(9600);
+  game_started = false;
 
-  enableInterrupt(BUTTON_1, choose_difficulty, RISING);
+  Serial.begin(9600);
+  rand_init();
+
+  enableInterrupt(BUTTON_1, start_game, RISING);
+  Serial.println("Welcome to the Restore the Light Game. Press Key B1 to Start");
+  while (!game_started) {
+    led_fade(STATUS_LED, 15);
+  }
 }
 
 void loop() {
-  if(!is_difficulty_chosen) {
-    view_difficulties();
-  }
-  else {
-    if (!is_interrupt_detached) {
-      disableInterrupt(BUTTON_1);
-      is_interrupt_detached = true;
-      Serial.println("Chosen game factor: " + String(game_factor));
+  if (game_started) {
+    if (!is_difficulty_chosen) {
+      view_difficulties();
+    } else {
+      if (!is_interrupt_detached) {
+        disableInterrupt(BUTTON_1);
+        is_interrupt_detached = true;
+      }
+      // Game start
+      led_on(game_leds[0]);
+      led_on(game_leds[1]);
+      led_on(game_leds[2]);
+      led_on(game_leds[3]);
+      delay(2000);
+      unsigned long *leds_to_turn_off = get_rand_multiple(4);
+      led_off(game_leds[leds_to_turn_off[0]]);
+      delay(1000);
+      led_off(game_leds[leds_to_turn_off[1]]);
+      delay(1000);
+      led_off(game_leds[leds_to_turn_off[2]]);
+      delay(1000);
+      led_off(game_leds[leds_to_turn_off[3]]);
+      free_rand_array(leds_to_turn_off);
+      delay(1000);
     }
   }
-  #ifdef CIRCUIT_SAMPLE
-  int buttonState1 = digitalRead(BUTTON_1);
-  int buttonState2 = digitalRead(BUTTON_2);
-  int buttonState3 = digitalRead(BUTTON_3);
-  int buttonState4 = digitalRead(BUTTON_4);
-
-  digitalWrite(STATUS_LED, HIGH);
-
-  if (buttonState1 == HIGH){
-    digitalWrite(12, HIGH);
-    Serial.println("ON BUTTON1");
-    digitalWrite(12, LOW);
-  }
-  if (buttonState2 == HIGH){
-    digitalWrite(11, HIGH);
-    Serial.println("ON BUTTON2");
-    digitalWrite(11, LOW);
-  }
-  if (buttonState3 == HIGH){
-    digitalWrite(10, HIGH);
-    Serial.println("ON BUTTON3");
-    digitalWrite(10, LOW);
-  }
-  if (buttonState4 == HIGH){
-    digitalWrite(9, HIGH);
-    Serial.println("ON BUTTON4");
-    digitalWrite(9, LOW);
-  }
-
-  int newValue = analogRead(POT_PIN);
-  if (newValue != current) {
-    current = newValue;
-    Serial.println(current);
- }
- #endif
 }
