@@ -109,7 +109,7 @@ void loop() {
       unsigned long *leds_to_turn_off = get_rand_multiple(4);
       for (uint8_t i = 0; i < NUM_GAME_LEDS; i++) {
         led_off(game_leds[leds_to_turn_off[i]]);
-        delay(1000); // DEFINE T1.
+        delay(t_led);
       }
       
       free_rand_array(leds_to_turn_off);
