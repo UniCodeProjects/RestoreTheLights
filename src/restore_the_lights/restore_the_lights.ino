@@ -54,6 +54,7 @@ void setup() {
   rand_init();
 
   enableInterrupt(BUTTON_1, start_game, RISING);
+  delay(100);    // For btn bouncing.
   Serial.println("Welcome to the Restore the Light Game. Press Key B1 to Start");
   while (!game_started) {
     led_fade(STATUS_LED, 15);
@@ -70,21 +71,16 @@ void loop() {
         is_interrupt_detached = true;
       }
       // Game start
-      led_on(game_leds[0]);
-      led_on(game_leds[1]);
-      led_on(game_leds[2]);
-      led_on(game_leds[3]);
+      for (uint8_t i = 0; i < NUM_GAME_LEDS; i++) {
+        led_on(game_leds[i]);
+      }
       delay(2000);
       unsigned long *leds_to_turn_off = get_rand_multiple(4);
-      led_off(game_leds[leds_to_turn_off[0]]);
-      delay(1000);
-      led_off(game_leds[leds_to_turn_off[1]]);
-      delay(1000);
-      led_off(game_leds[leds_to_turn_off[2]]);
-      delay(1000);
-      led_off(game_leds[leds_to_turn_off[3]]);
+      for (uint8_t i = 0; i < NUM_GAME_LEDS; i++) {
+        led_off(game_leds[leds_to_turn_off[i]]);
+        delay(1000);
+      }
       free_rand_array(leds_to_turn_off);
-      delay(1000);
     }
   }
 }
