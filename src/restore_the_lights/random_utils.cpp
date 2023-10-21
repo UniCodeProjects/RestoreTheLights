@@ -27,7 +27,7 @@ static void shuffle(unsigned long array[], uint8_t n) {
 }
 
 static unsigned long *generate_array(const uint8_t size) {
-  unsigned long *array = (unsigned long *) malloc(size);
+  unsigned long *array = (unsigned long *) malloc(size * sizeof(unsigned long));
   if (array == NULL) {
     return NULL;
   }
