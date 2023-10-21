@@ -1,5 +1,4 @@
 #include <stdint.h>
-#include <assert.h>
 #include "Arduino.h"
 #include "leds.h"
 
@@ -26,13 +25,11 @@ bool is_pwm(const uint8_t pin);
 /********************************************************************/
 
 void led_on(const uint8_t pin) {
-  assert(led_state == LOW);
   digitalWrite(pin, HIGH);
   led_state = HIGH;
 }
 
 void led_off(const uint8_t pin) {
-  assert(led_state == HIGH);
   digitalWrite(pin, LOW);
   led_state = LOW;
 }
@@ -53,7 +50,9 @@ void led_blink(const uint8_t pin, const unsigned long delay_ms) {
 
 void led_fade(const uint8_t pin, const unsigned long delay_ms) {
 #ifdef ARDUINO_UNO
-  assert(is_pwm(pin));
+  if (!is_pwm(pin)) {
+    return;
+  }
 #endif
   // Without delay (busy-waiting).
   const unsigned long current_ms = millis();
