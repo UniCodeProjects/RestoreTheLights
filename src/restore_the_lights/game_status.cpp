@@ -1,10 +1,13 @@
 #include "game_status.h"
 #include "macros.h"
+#include "buttons.h"
 #include "leds.h"
 #include "difficulty.h"
 #include "random_utils.h"
+#include "level.h"
 #include <avr/sleep.h>
 #include <Arduino.h>
+#include <stdlib.h>
 
 #define EI_NOTPORTC
 #define EI_NOTPORTB
@@ -24,6 +27,11 @@ unsigned long t_led = 3000;
 unsigned long t_btn = 15000;
 
 unsigned long prev_ms = 0;
+
+uint8_t *correct_button_sequence;
+uint8_t *user_button_sequence;
+uint8_t num_buttons_pressed;
+static bool is_pressing_started;
 
 static void choose_difficulty() {
   uint8_t chosen_difficulty = get_chosen_difficulty();
@@ -50,6 +58,10 @@ void game_setup() {
   }
   Serial.begin(9600);
   rand_init();
+  correct_button_sequence = (uint8_t *) malloc(NUM_BUTTONS * sizeof(uint8_t));
+  user_button_sequence = (uint8_t *) malloc(NUM_BUTTONS * sizeof(uint8_t));
+  num_buttons_pressed = 0;
+  is_pressing_started = false;
   Serial.println("Welcome to the Restore the Light Game. Press Key B1 to Start");
   enableInterrupt(BUTTON_1, start_game, RISING);
 }
@@ -85,19 +97,63 @@ void leds_on() {
   // Turning off the leds in a random sequence.
   delay(2000);
   uint8_t *leds_to_turn_off = get_rand_multiple(4);
+  // Initializing correct_button_sequence as the reverse of leds_to_turn_off
+  for (uint8_t i = 0; i < NUM_BUTTONS; i++) {
+    correct_button_sequence[i] = leds_to_turn_off[NUM_BUTTONS - i - 1];
+  }
+
   for (uint8_t i = 0; i < NUM_GAME_LEDS; i++) {
       led_off(game_leds[leds_to_turn_off[i]]);
       delay(t_led);
   }
   free_rand_array(leds_to_turn_off);
+  update_game_status(PRESSING);
 }
 
 void pressing() {
+  if (!is_pressing_started) {
+    Serial.println("pressing initialization");
+    enableInterrupt(BUTTON_1, button1_push, RISING);
+    enableInterrupt(BUTTON_2, button2_push, RISING);
+    attachInterrupt(digitalPinToInterrupt(BUTTON_3), button3_push, RISING);
+    attachInterrupt(digitalPinToInterrupt(BUTTON_4), button4_push, RISING);
+    is_pressing_started = true;
+  }
 
+  if (num_buttons_pressed == NUM_BUTTONS) {
+    disableInterrupt(BUTTON_1);
+    disableInterrupt(BUTTON_2);
+    detachInterrupt(digitalPinToInterrupt(BUTTON_3));
+    detachInterrupt(digitalPinToInterrupt(BUTTON_4));
+    update_game_status(GAME_END);
+  }
+}
+
+static bool are_arrays_equal(uint8_t *a1, uint8_t* a2, uint8_t size) {
+  for (uint8_t i = 0; i < size; i++) {
+    if (a1[i] != a2[i]) {
+      return false;
+    }
+  }
+  return true;
+}
+
+static void game_over() {
+  led_on(STATUS_LED);
+  delay(1000);
+  led_off(STATUS_LED);
+  Serial.println("GAME OVER");
+  // delay(1000);
 }
 
 void game_end() {
-
+  if (are_arrays_equal(correct_button_sequence, user_button_sequence, NUM_BUTTONS)) {
+    next_level();
+  } else {
+    game_over();
+  }
+  free(user_button_sequence);
+  free(correct_button_sequence);
 }
 
 void wake_up() {
@@ -121,4 +177,26 @@ void sleeping() {
   }
   enableInterrupt(BUTTON_1, start_game, RISING);
   update_game_status(WAITING);
+}
+
+static bool button_already_pressed(const uint8_t btn_index) {
+  uint8_t count = 0;
+  for (uint8_t i = 0; i < num_buttons_pressed; i++) {
+    if (user_button_sequence[i] == btn_index) {
+      count++;
+    }
+  }
+  return num_buttons_pressed != 0 ? count > 0 : false;
+}
+
+void press_button(const uint8_t btn_index) {
+  if (!button_already_pressed(btn_index)) {
+    user_button_sequence[num_buttons_pressed] = btn_index;
+    num_buttons_pressed++;
+  }
+  Serial.println("user_button_sequence:");
+  for (uint8_t i = 0; i < num_buttons_pressed; i++) {
+    Serial.println(user_button_sequence[i]);
+  }
+  Serial.println("end of user_button_sequence");
 }

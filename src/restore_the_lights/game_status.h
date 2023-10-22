@@ -1,6 +1,8 @@
 #ifndef GAME_STATUS_H_
 #define GAME_STATUS_H_
 
+#include <inttypes.h>
+
 typedef enum status {
     WAITING,
     SELECTING,
@@ -27,5 +29,7 @@ void pressing();
 void game_end();
 
 void sleeping();
+
+void press_button(const uint8_t btn_index);
 
 #endif
