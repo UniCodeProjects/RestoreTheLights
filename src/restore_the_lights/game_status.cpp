@@ -84,7 +84,7 @@ void leds_on() {
   }
   // Turning off the leds in a random sequence.
   delay(2000);
-  unsigned long *leds_to_turn_off = get_rand_multiple(4);
+  uint8_t *leds_to_turn_off = get_rand_multiple(4);
   for (uint8_t i = 0; i < NUM_GAME_LEDS; i++) {
       led_off(game_leds[leds_to_turn_off[i]]);
       delay(t_led);

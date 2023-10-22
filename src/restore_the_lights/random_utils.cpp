@@ -12,13 +12,13 @@ static bool isInit = false;
 /*                                                       */
 /*********************************************************/
 
-static void swap (unsigned long *a, unsigned long *b) {
+static void swap (uint8_t *a, uint8_t *b) {
   unsigned long temp = *a;
   *a = *b;
   *b = temp;
 }
 
-static void shuffle(unsigned long array[], uint8_t n) {
+static void shuffle(uint8_t array[], uint8_t n) {
   for (uint8_t i = n - 1; i > 0; i--) {
     // Picks a random index from 0 to i.
     const uint8_t j = rand() % (i + 1);
@@ -26,8 +26,8 @@ static void shuffle(unsigned long array[], uint8_t n) {
   }
 }
 
-static unsigned long *generate_array(const uint8_t size) {
-  unsigned long *array = (unsigned long *) malloc(size * sizeof(unsigned long));
+static uint8_t *generate_array(const uint8_t size) {
+  uint8_t *array = (uint8_t *)malloc(size * sizeof(uint8_t));
   if (array == NULL) {
     return NULL;
   }
@@ -48,19 +48,19 @@ void rand_init() {
   isInit = true;
 }
 
-unsigned long get_rand(const unsigned int range_end) {
+uint8_t get_rand(const uint8_t range_end) {
   return isInit ? rand() % range_end : range_end;
 }
 
-unsigned long *get_rand_multiple(const unsigned int size) {
+uint8_t *get_rand_multiple(const uint8_t size) {
   if (!isInit) {
     return NULL;
   }
-  unsigned long *result = generate_array(size);
+  uint8_t *result = generate_array(size);
   shuffle(result, size);
   return result;
 }
 
-void free_rand_array(unsigned long *array) {
+void free_rand_array(uint8_t *array) {
   free(array);
 }
