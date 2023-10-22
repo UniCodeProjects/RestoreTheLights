@@ -22,4 +22,6 @@ float get_difficulty_factor(const uint8_t difficulty);
 // Returns the difficulty chosen by the user
 uint8_t get_chosen_difficulty();
 
+uint8_t get_corresponding_led(const uint8_t difficulty);
+
 #endif
