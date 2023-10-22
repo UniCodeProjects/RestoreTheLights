@@ -23,6 +23,8 @@ unsigned long t_led = 3000;
 // The available delta time to press the buttons.
 unsigned long t_btn = 15000;
 
+unsigned long prev_ms = 0;
+
 static void choose_difficulty() {
   uint8_t chosen_difficulty = get_chosen_difficulty();
   game_factor = get_difficulty_factor(chosen_difficulty);
@@ -40,7 +42,7 @@ static void start_game() {
 }
 
 void game_setup() {
-    for(int i = 0; i < NUM_GAME_LEDS; i++) {
+  for(int i = 0; i < NUM_GAME_LEDS; i++) {
     pinMode(game_leds[i], OUTPUT);
   }
   for(int i = 0; i < NUM_BUTTONS; i++) {
@@ -53,14 +55,12 @@ void game_setup() {
 }
 
 status get_game_status() {
-    return current_status;
+  return current_status;
 }
 
 void update_game_status(const status new_status) {
-    current_status = new_status;
+  current_status = new_status;
 }
-
-unsigned long prev_ms = 0;
 
 void waiting() {
   const unsigned long curr_ms = millis();
@@ -73,23 +73,23 @@ void waiting() {
 }
 
 void selecting() {
-    view_difficulties();
+  view_difficulties();
 }
 
 void leds_on() {
-    Serial.println("Go!");
-    // Turning on all leds.
-    for (uint8_t i = 0; i < NUM_GAME_LEDS; i++) {
-      led_on(game_leds[i]);
-    }
-    // Turning off the leds in a random sequence.
-    delay(2000);
-    unsigned long *leds_to_turn_off = get_rand_multiple(4);
-    for (uint8_t i = 0; i < NUM_GAME_LEDS; i++) {
-        led_off(game_leds[leds_to_turn_off[i]]);
-        delay(t_led);
-    }
-    free_rand_array(leds_to_turn_off);
+  Serial.println("Go!");
+  // Turning on all leds.
+  for (uint8_t i = 0; i < NUM_GAME_LEDS; i++) {
+    led_on(game_leds[i]);
+  }
+  // Turning off the leds in a random sequence.
+  delay(2000);
+  unsigned long *leds_to_turn_off = get_rand_multiple(4);
+  for (uint8_t i = 0; i < NUM_GAME_LEDS; i++) {
+      led_off(game_leds[leds_to_turn_off[i]]);
+      delay(t_led);
+  }
+  free_rand_array(leds_to_turn_off);
 }
 
 void pressing() {
@@ -105,9 +105,10 @@ void wake_up() {
 
 void sleeping() {
   disableInterrupt(BUTTON_1);
-  for (uint8_t i = 0; i < NUM_BUTTONS; i++) {
-    enableInterrupt(buttons[i], wake_up, RISING);
-  }
+  enableInterrupt(BUTTON_1, wake_up, RISING);
+  enableInterrupt(BUTTON_2, wake_up, RISING);
+  attachInterrupt(digitalPinToInterrupt(BUTTON_3), wake_up, RISING);
+  attachInterrupt(digitalPinToInterrupt(BUTTON_4), wake_up, RISING);
   Serial.println("sleeping");
   Serial.flush();
   digitalWrite(STATUS_LED, LOW);
