@@ -2,7 +2,6 @@
 #include "macros.h"
 #include "leds.h"
 #include <Arduino.h>
-#include <string.h>
 
 #define LEVELS 4
 #define POT_VALUES 1024
@@ -27,7 +26,7 @@ uint8_t get_difficulty(const uint16_t value) {
   return ret_val;
 }
 
-static uint8_t get_corresponding_led(const uint8_t difficulty) {
+uint8_t get_corresponding_led(const uint8_t difficulty) {
   uint8_t led;
   switch(difficulty) {
     case EASY:

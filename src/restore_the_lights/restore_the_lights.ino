@@ -1,5 +1,6 @@
 #include "macros.h"
 #include "difficulty.h"
+#include "leds.h"
 
 #define EI_NOTPORTC
 #define EI_NOTPORTB
@@ -25,6 +26,13 @@ static bool is_difficulty_chosen;
 static bool is_interrupt_detached;
 float game_factor;
 
+static void choose_difficulty() {
+  is_difficulty_chosen = true;
+  uint8_t chosen_difficulty = get_chosen_difficulty();
+  game_factor = get_difficulty_factor(chosen_difficulty);
+  led_off(get_corresponding_led(chosen_difficulty));
+}
+
 void setup() {
   for(int i = 0; i < NUM_GAME_LEDS; i++) {
     pinMode(game_leds[i], OUTPUT);
@@ -48,8 +56,8 @@ void loop() {
     if (!is_interrupt_detached) {
       disableInterrupt(BUTTON_1);
       is_interrupt_detached = true;
+      Serial.println("Chosen game factor: " + String(game_factor));
     }
-    Serial.println("Chosen game factor: " + String(game_factor));
   }
   #ifdef CIRCUIT_SAMPLE
   int buttonState1 = digitalRead(BUTTON_1);
@@ -86,9 +94,4 @@ void loop() {
     Serial.println(current);
  }
  #endif
-}
-
-static void choose_difficulty() {
-  game_factor = get_difficulty_factor(get_chosen_difficulty());
-  is_difficulty_chosen = true;
 }
