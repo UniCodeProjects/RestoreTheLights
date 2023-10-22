@@ -8,6 +8,7 @@
 #include <avr/sleep.h>
 #include <Arduino.h>
 #include <stdlib.h>
+#include <TimerOne.h>
 
 #define EI_NOTPORTC
 #define EI_NOTPORTB
@@ -110,8 +111,24 @@ void leds_on() {
   update_game_status(PRESSING);
 }
 
+static void game_over() {
+  led_on(STATUS_LED);
+  delay(1000);
+  led_off(STATUS_LED);
+  delay(10000);
+}
+
+static void set_game_end() {
+  update_game_status(GAME_END);
+}
+
 void pressing() {
   if (!is_pressing_started) {
+    noInterrupts();
+    Timer1.initialize(t_btn * 1000);
+    Timer1.stop();
+    Timer1.attachInterrupt(set_game_end);
+    interrupts();
     Serial.println("pressing initialization");
     enableInterrupt(BUTTON_1, button1_push, RISING);
     enableInterrupt(BUTTON_2, button2_push, RISING);
@@ -121,6 +138,7 @@ void pressing() {
   }
 
   if (num_buttons_pressed == NUM_BUTTONS) {
+    Timer1.detachInterrupt();
     disableInterrupt(BUTTON_1);
     disableInterrupt(BUTTON_2);
     detachInterrupt(digitalPinToInterrupt(BUTTON_3));
@@ -138,16 +156,9 @@ static bool are_arrays_equal(uint8_t *a1, uint8_t* a2, uint8_t size) {
   return true;
 }
 
-static void game_over() {
-  led_on(STATUS_LED);
-  delay(1000);
-  led_off(STATUS_LED);
-  Serial.println("GAME OVER");
-  // delay(1000);
-}
-
 void game_end() {
-  if (are_arrays_equal(correct_button_sequence, user_button_sequence, NUM_BUTTONS)) {
+  // the second operand of the && operator is needed to handle the game over in case t_btn expires
+  if (are_arrays_equal(correct_button_sequence, user_button_sequence, NUM_BUTTONS) && num_buttons_pressed == NUM_BUTTONS) {
     next_level();
   } else {
     game_over();
