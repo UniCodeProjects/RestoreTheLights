@@ -1,4 +1,3 @@
-#include <stdint.h>
 #include "Arduino.h"
 #include "leds.h"
 
