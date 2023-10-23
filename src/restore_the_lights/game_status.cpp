@@ -115,28 +115,16 @@ static void game_over() {
   delay(1000);
   led_off(STATUS_LED);
   delay(1000);
+  Serial.println("GAME OVER!");
+  // reset_game_variables();
+  // update_game_status(WAITING);
 }
 
-static void set_game_end() {
-  Serial.println("ENTERING GAME END");
-  update_game_status(GAME_END);
-  Timer1.detachInterrupt();
-  return;
-}
+// static void set_game_end() {
+//   update_game_status(GAME_END);
+// }
 
 void pressing() {
-  // static unsigned long prev_ms = 0;
-  // const unsigned long curr_ms = millis();
-  // if (curr_ms - prev_ms >= t_btn && !is_pressing_started) {
-  //   prev_ms = curr_ms;
-  //   Serial.println("ENTERING GAME END");
-  //   update_game_status(GAME_END);
-  //   return;
-  // }
-  noInterrupts();
-  Timer1.initialize(5000);
-  Timer1.attachInterrupt(set_game_end);
-  interrupts();
   if (!is_pressing_started) {
     Serial.println("pressing initialization");
     enableInterrupt(BUTTON_1, button1_push, RISING);
@@ -147,7 +135,6 @@ void pressing() {
   }
 
   if (num_buttons_pressed == NUM_BUTTONS) {
-    Timer1.detachInterrupt();
     disableInterrupt(BUTTON_1);
     disableInterrupt(BUTTON_2);
     detachInterrupt(digitalPinToInterrupt(BUTTON_3));
@@ -166,15 +153,16 @@ static bool are_arrays_equal(uint8_t *a1, uint8_t* a2, uint8_t size) {
 }
 
 void game_end() {
-  Serial.println("GAME END STATE");
   // the second operand of the && operator is needed to handle the game over in case t_btn expires
-  if (are_arrays_equal(correct_button_sequence, user_button_sequence, NUM_BUTTONS) && num_buttons_pressed == NUM_BUTTONS) {
+  bool is_victory = are_arrays_equal(correct_button_sequence, user_button_sequence, NUM_BUTTONS) 
+    && num_buttons_pressed == NUM_BUTTONS;
+  free(user_button_sequence);
+  free(correct_button_sequence);
+  if (is_victory) {
     next_level();
   } else {
     game_over();
   }
-  free(user_button_sequence);
-  free(correct_button_sequence);
 }
 
 void wake_up() {
