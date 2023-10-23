@@ -121,6 +121,9 @@ void leds_on() {
 
   for (uint8_t i = 0; i < NUM_GAME_LEDS; i++) {
       led_off(game_leds[leds_to_turn_off[i]]);
+      if (i == NUM_GAME_LEDS - 1) {
+        break;
+      }
       delay(t_led);
   }
   free_rand_array(leds_to_turn_off);
@@ -138,6 +141,11 @@ static void game_over() {
   print_score_to_serial(true);
   delay(10000);
   reset_game_variables();
+  disableInterrupt(BUTTON_1);
+  enableInterrupt(BUTTON_1, start_game, RISING);
+  disableInterrupt(BUTTON_2);
+  detachInterrupt(digitalPinToInterrupt(BUTTON_3));
+  detachInterrupt(digitalPinToInterrupt(BUTTON_4));
   update_game_status(WAITING);
 }
 
