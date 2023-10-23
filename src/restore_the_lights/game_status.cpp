@@ -181,9 +181,10 @@ void sleeping() {
   sleep_enable();
   sleep_mode();
   sleep_disable();
-  for (uint8_t i = 0; i < NUM_BUTTONS; i++) {
-    disableInterrupt(buttons[i]);
-  }
+  disableInterrupt(BUTTON_1);
+  disableInterrupt(BUTTON_2);
+  detachInterrupt(digitalPinToInterrupt(BUTTON_3));
+  detachInterrupt(digitalPinToInterrupt(BUTTON_4));
   enableInterrupt(BUTTON_1, start_game, RISING);
   update_game_status(WAITING);
 }
