@@ -1,6 +1,5 @@
 #include <time.h>
 #include <stdlib.h>
-#include <inttypes.h>
 #include "random_utils.h"
 #include "Arduino.h"
 
@@ -44,7 +43,8 @@ static uint8_t *generate_array(const uint8_t size) {
 /*********************************************************/
 
 void rand_init() {
-  srand(time(NULL));
+  // Reading an analog unconnected pin to generate a random seed.
+  srand(analogRead(A5));
   isInit = true;
 }
 
