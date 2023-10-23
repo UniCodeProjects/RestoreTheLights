@@ -5,6 +5,7 @@
 #include "difficulty.h"
 #include "random_utils.h"
 #include "level.h"
+#include "score.h"
 #include <avr/sleep.h>
 #include <Arduino.h>
 #include <stdlib.h>
@@ -16,6 +17,9 @@
 
 #include <EnableInterrupt.h>
 
+#define INIT_T_LED_VAL 3000
+#define INIT_T_BTN_VAL 15000
+
 static status current_status = WAITING;
 
 const int game_leds[NUM_GAME_LEDS] = {GAME_LED_1, GAME_LED_2, GAME_LED_3, GAME_LED_4};
@@ -23,14 +27,15 @@ const int buttons[NUM_BUTTONS] = {BUTTON_1, BUTTON_2, BUTTON_3, BUTTON_4};
 
 float game_factor;
 // The leds' turning on delta time.
-unsigned long t_led = 3000;
+unsigned long t_led = INIT_T_LED_VAL;
 // The available delta time to press the buttons.
-unsigned long t_btn = 15000;
+unsigned long t_btn = INIT_T_BTN_VAL;
 
 uint8_t *correct_button_sequence;
 uint8_t *user_button_sequence;
 uint8_t num_buttons_pressed;
 static bool is_pressing_started;
+static unsigned long prev_ms = 0;
 
 static void choose_difficulty() {
   uint8_t chosen_difficulty = get_chosen_difficulty();
@@ -46,6 +51,18 @@ static void start_game() {
   enableInterrupt(BUTTON_1, choose_difficulty, RISING);
   Serial.println("Choose difficulty:");
   update_game_status(SELECTING);
+}
+
+static void reset_game_variables() {
+  correct_button_sequence = (uint8_t *) malloc(NUM_BUTTONS * sizeof(uint8_t));
+  user_button_sequence = (uint8_t *) malloc(NUM_BUTTONS * sizeof(uint8_t));
+  t_led = INIT_T_LED_VAL;
+  t_btn = INIT_T_BTN_VAL;
+  num_buttons_pressed = 0;
+  is_pressing_started = false;
+  reset_score();
+  prev_ms = millis();
+  enableInterrupt(BUTTON_1, start_game, RISING);
 }
 
 void game_setup() {
@@ -74,7 +91,6 @@ void update_game_status(const status new_status) {
 }
 
 void waiting() {
-  static unsigned long prev_ms = 0;
   const unsigned long curr_ms = millis();
   if (curr_ms - prev_ms >= 10000) {
     prev_ms = curr_ms;
@@ -114,10 +130,14 @@ static void game_over() {
   led_on(STATUS_LED);
   delay(1000);
   led_off(STATUS_LED);
-  delay(1000);
-  Serial.println("GAME OVER!");
-  // reset_game_variables();
-  // update_game_status(WAITING);
+  for (uint8_t i = 0; i < NUM_GAME_LEDS; i++) {
+    led_off(game_leds[i]);
+  }
+  // delay(1000);
+  print_score_to_serial(true);
+  delay(10000);
+  reset_game_variables();
+  update_game_status(WAITING);
 }
 
 // static void set_game_end() {
