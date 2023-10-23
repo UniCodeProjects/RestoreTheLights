@@ -4,6 +4,8 @@
 // Increases the current score by one point.
 void increase_score();
 
+void reset_score();
+
 // Prints the current score on the serial monitor.
 void print_score_to_serial(const bool gameover = false);
 
