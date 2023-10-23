@@ -8,6 +8,10 @@ void increase_score() {
     score++;
 }
 
+void reset_score() {
+    score = 0;
+}
+
 void print_score_to_serial(const bool gameover = false) {
     char buffer[64];
     const char *msg = gameover ? "Game Over. Final" : "New point!";
