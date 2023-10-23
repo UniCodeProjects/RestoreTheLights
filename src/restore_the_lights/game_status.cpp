@@ -25,6 +25,36 @@ unsigned long t_btn = 15000;
 
 unsigned long prev_ms = 0;
 
+const uint16_t DEBOUNCE_DELAY = 50; // the debounce time; increase if the output flickers
+
+static bool debounce(const uint8_t btn_pin) {
+  static uint32_t last_debounce_time = 0;  // the last time the output pin was toggled
+  static uint8_t button_state = HIGH;     // the current reading from the input pin
+  static uint8_t last_button_state = HIGH; // the previous reading from the input pin
+
+  uint8_t reading = digitalRead(btn_pin);
+
+  // If the button state has changed:
+  if (reading != last_button_state) {
+    // Reset the debouncing timer
+    last_debounce_time = millis();
+  }
+
+  if ((millis() - last_debounce_time) > DEBOUNCE_DELAY) {
+    // If the button state has changed:
+    if (reading != button_state) {
+      button_state = reading;
+
+      // Only toggle the LED if the new button state is HIGH
+      if (button_state == HIGH) {
+        return true;
+      }
+    }
+  }
+  return false;
+}
+
+
 static void choose_difficulty() {
   uint8_t chosen_difficulty = get_chosen_difficulty();
   game_factor = get_difficulty_factor(chosen_difficulty);
@@ -34,11 +64,14 @@ static void choose_difficulty() {
 }
 
 static void start_game() {
-  led_off(STATUS_LED);
-  disableInterrupt(BUTTON_1);
-  enableInterrupt(BUTTON_1, choose_difficulty, RISING);
-  Serial.println("Choose difficulty:");
-  update_game_status(SELECTING);
+  Serial.println(debounce(BUTTON_1));
+  if (debounce(BUTTON_1)) {
+    led_off(STATUS_LED);
+    disableInterrupt(BUTTON_1);
+    enableInterrupt(BUTTON_1, choose_difficulty, RISING);
+    Serial.println("Choose difficulty:");
+    update_game_status(SELECTING);
+  }
 }
 
 void game_setup() {
@@ -101,6 +134,8 @@ void game_end() {
 }
 
 void wake_up() {
+  if (debounce(BUTTON_1) && debounce(BUTTON_2) && debounce(BUTTON_3) && debounce(BUTTON_4)) {
+  }
 }
 
 void sleeping() {
