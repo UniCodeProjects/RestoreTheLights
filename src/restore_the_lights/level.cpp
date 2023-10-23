@@ -1,5 +1,6 @@
 #include <math.h>
 #include <assert.h>
+#include <Arduino.h>
 #include "level.h"
 
 #define LED_THRESHOLD_MS 100
@@ -26,4 +27,5 @@ void next_level() {
         t_led = abs(lround(t_led * game_factor));
         t_btn = abs(lround(t_btn * game_factor));
     }
+    Serial.println("YOU WON THE LEVEL");
 }
