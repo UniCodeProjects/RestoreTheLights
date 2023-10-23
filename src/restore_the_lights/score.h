@@ -5,6 +5,6 @@
 void increase_score();
 
 // Prints the current score on the serial monitor.
-void print_score_to_serial();
+void print_score_to_serial(const bool gameover = false);
 
 #endif

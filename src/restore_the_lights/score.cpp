@@ -8,8 +8,9 @@ void increase_score() {
     score++;
 }
 
-void print_score_to_serial() {
+void print_score_to_serial(const bool gameover = false) {
     char buffer[64];
-    sprintf(buffer, "New point! Score: %" PRIu16 "", score);
+    const char *msg = gameover ? "Game Over. Final" : "New point!";
+    sprintf(buffer, "%s Score: %" PRIu16 "", msg, score);
     Serial.println(buffer);
 }
