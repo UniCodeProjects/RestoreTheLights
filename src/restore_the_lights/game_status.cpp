@@ -66,6 +66,13 @@ static void reset_game_variables() {
   enableInterrupt(BUTTON_1, start_game, RISING);
 }
 
+static void reset_game_variables_for_next_level() {
+  correct_button_sequence = (uint8_t *) malloc(NUM_BUTTONS * sizeof(uint8_t));
+  user_button_sequence = (uint8_t *) malloc(NUM_BUTTONS * sizeof(uint8_t));
+  num_buttons_pressed = 0;
+  is_pressing_started = false;
+}
+
 void game_setup() {
   for(int i = 0; i < NUM_GAME_LEDS; i++) {
     pinMode(game_leds[i], OUTPUT);
@@ -189,6 +196,10 @@ void game_end() {
   free(user_button_sequence);
   free(correct_button_sequence);
   if (is_victory) {
+    increase_score();
+    print_score_to_serial();
+    update_game_status(LEDS_ON);
+    reset_game_variables_for_next_level();
     next_level();
   } else {
     game_over();
