@@ -1,4 +1,5 @@
 #include <math.h>
+#include <Arduino.h>
 #include "level.h"
 
 #define LED_THRESHOLD_MS 100
