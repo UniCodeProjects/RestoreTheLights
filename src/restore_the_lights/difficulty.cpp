@@ -108,3 +108,7 @@ void view_difficulties() {
 uint8_t get_chosen_difficulty() {
   return current_difficulty;
 }
+
+void reset_game_difficulty() {
+  current_difficulty = 0;
+}

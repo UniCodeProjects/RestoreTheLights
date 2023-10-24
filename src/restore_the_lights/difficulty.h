@@ -18,4 +18,7 @@ void view_difficulties();
 // Returns the difficulty chosen by the user.
 uint8_t get_chosen_difficulty();
 
+// Resets the game difficulty to the default value.
+void reset_game_difficulty();
+
 #endif
