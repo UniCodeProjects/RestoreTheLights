@@ -9,7 +9,6 @@
 #include <avr/sleep.h>
 #include <Arduino.h>
 #include <stdlib.h>
-#include <TimerOne.h>
 
 #define EI_NOTPORTC
 #define EI_NOTPORTB
@@ -138,21 +137,20 @@ void leds_on() {
 }
 
 static void game_over() {
+  disableInterrupt(BUTTON_1);
+  disableInterrupt(BUTTON_2);
+  detachInterrupt(digitalPinToInterrupt(BUTTON_3));
+  detachInterrupt(digitalPinToInterrupt(BUTTON_4));
   led_on(STATUS_LED);
   delay(1000);
   led_off(STATUS_LED);
   for (uint8_t i = 0; i < NUM_GAME_LEDS; i++) {
     led_off(game_leds[i]);
   }
-  // delay(1000);
   print_score_to_serial(true);
   delay(10000);
   reset_game_variables();
-  disableInterrupt(BUTTON_1);
   enableInterrupt(BUTTON_1, start_game, RISING);
-  disableInterrupt(BUTTON_2);
-  detachInterrupt(digitalPinToInterrupt(BUTTON_3));
-  detachInterrupt(digitalPinToInterrupt(BUTTON_4));
   update_game_status(WAITING);
 }
 
@@ -245,9 +243,4 @@ void press_button(const uint8_t btn_index) {
     user_button_sequence[num_buttons_pressed] = btn_index;
     num_buttons_pressed++;
   }
-  Serial.println("user_button_sequence:");
-  for (uint8_t i = 0; i < num_buttons_pressed; i++) {
-    Serial.println(user_button_sequence[i]);
-  }
-  Serial.println("end of user_button_sequence");
 }
