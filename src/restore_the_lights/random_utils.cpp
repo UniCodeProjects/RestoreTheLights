@@ -60,7 +60,3 @@ uint8_t *get_rand_multiple(const uint8_t size) {
   shuffle(result, size);
   return result;
 }
-
-void free_rand_array(uint8_t *array) {
-  free(array);
-}

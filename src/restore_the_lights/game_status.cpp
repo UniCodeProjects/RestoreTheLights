@@ -132,7 +132,7 @@ void leds_on() {
       }
       delay(t_led);
   }
-  free_rand_array(leds_to_turn_off);
+  free(leds_to_turn_off);
   update_game_status(PRESSING);
 }
 
