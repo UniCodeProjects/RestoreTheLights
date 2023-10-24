@@ -18,6 +18,9 @@
 
 #define INIT_T_LED_VAL 3000
 #define INIT_T_BTN_VAL 15000
+#define SLEEP_DELAY_MS 10000
+#define GAME_OVER_DELAY_MS 10000
+#define TIME_BEFORE_LEDS_TURN_OFF 2000
 
 static status current_status = WAITING;
 
@@ -90,7 +93,7 @@ static void game_over() {
     led_off(game_leds[i]);
   }
   print_score_to_serial(true);
-  delay(10000);
+  delay(GAME_OVER_DELAY_MS);
   reset_game_variables();
   enableInterrupt(BUTTON_1, start_game, RISING);
   update_game_status(WAITING);
@@ -118,7 +121,7 @@ void game_setup() {
   user_button_sequence = (uint8_t *) malloc(NUM_BUTTONS * sizeof(uint8_t));
   num_buttons_pressed = 0;
   is_pressing_started = false;
-  Serial.println("Welcome to the Restore the Light Game. Press Key B1 to Start");
+  Serial.println("Welcome to the Restore the Lights Game. Press Key B1 to Start");
   enableInterrupt(BUTTON_1, start_game, RISING);
 }
 
@@ -132,7 +135,7 @@ void update_game_status(const status new_status) {
 
 void waiting() {
   const unsigned long curr_ms = millis();
-  if (curr_ms - prev_ms >= 10000) {
+  if (curr_ms - prev_ms >= SLEEP_DELAY_MS) {
     prev_ms = curr_ms;
     update_game_status(SLEEPING);
     return;
@@ -151,7 +154,7 @@ void leds_on() {
     led_on(game_leds[i]);
   }
   // Turning off the leds in a random sequence.
-  delay(2000);
+  delay(TIME_BEFORE_LEDS_TURN_OFF);
   uint8_t *leds_to_turn_off = get_rand_multiple(4);
   // Initializing correct_button_sequence as the reverse of leds_to_turn_off
   for (uint8_t i = 0; i < NUM_BUTTONS; i++) {
@@ -171,7 +174,6 @@ void leds_on() {
 
 void pressing() {
   if (!is_pressing_started) {
-    Serial.println("pressing initialization");
     enableInterrupt(BUTTON_1, button1_push, RISING);
     enableInterrupt(BUTTON_2, button2_push, RISING);
     attachInterrupt(digitalPinToInterrupt(BUTTON_3), button3_push, RISING);
@@ -221,7 +223,6 @@ void sleeping() {
   enableInterrupt(BUTTON_2, wake_up, RISING);
   attachInterrupt(digitalPinToInterrupt(BUTTON_3), wake_up, RISING);
   attachInterrupt(digitalPinToInterrupt(BUTTON_4), wake_up, RISING);
-  Serial.println("sleeping");
   Serial.flush();
   digitalWrite(STATUS_LED, LOW);
   set_sleep_mode(SLEEP_MODE_PWR_DOWN);
