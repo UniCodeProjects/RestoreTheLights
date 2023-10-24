@@ -30,9 +30,9 @@ unsigned long t_led = INIT_T_LED_VAL;
 // The available delta time to press the buttons.
 unsigned long t_btn = INIT_T_BTN_VAL;
 
-uint8_t *correct_button_sequence;
 uint8_t *user_button_sequence;
 uint8_t num_buttons_pressed;
+static uint8_t *correct_button_sequence;
 static bool is_pressing_started;
 static unsigned long prev_ms = 0;
 unsigned long start_level_time = 0;
@@ -197,9 +197,9 @@ void game_end() {
   if (is_victory) {
     increase_score();
     print_score_to_serial();
-    update_game_status(LEDS_ON);
     reset_game_variables_for_next_level();
     next_level();
+    update_game_status(LEDS_ON);
   } else {
     game_over();
   }
@@ -227,21 +227,4 @@ void sleeping() {
   detachInterrupt(digitalPinToInterrupt(BUTTON_4));
   enableInterrupt(BUTTON_1, start_game, RISING);
   update_game_status(WAITING);
-}
-
-static bool button_already_pressed(const uint8_t btn_index) {
-  uint8_t count = 0;
-  for (uint8_t i = 0; i < num_buttons_pressed; i++) {
-    if (user_button_sequence[i] == btn_index) {
-      count++;
-    }
-  }
-  return num_buttons_pressed != 0 ? count > 0 : false;
-}
-
-void press_button(const uint8_t btn_index) {
-  if (!button_already_pressed(btn_index)) {
-    user_button_sequence[num_buttons_pressed] = btn_index;
-    num_buttons_pressed++;
-  }
 }

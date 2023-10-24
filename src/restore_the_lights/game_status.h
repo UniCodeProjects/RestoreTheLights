@@ -30,6 +30,4 @@ void game_end();
 
 void sleeping();
 
-void press_button(const uint8_t btn_index);
-
 #endif
