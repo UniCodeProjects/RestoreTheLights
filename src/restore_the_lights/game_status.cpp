@@ -173,7 +173,9 @@ void pressing() {
     detachInterrupt(digitalPinToInterrupt(BUTTON_4));
     update_game_status(GAME_END);
   } else {
-    if (millis() - start_level_time >= t_btn) {
+    const unsigned long current_time = millis();
+    if (current_time - start_level_time >= t_btn) {
+      start_level_time = current_time;
       update_game_status(GAME_END);
     }
   }
