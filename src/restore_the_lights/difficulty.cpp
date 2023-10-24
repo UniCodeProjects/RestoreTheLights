@@ -6,44 +6,15 @@
 #define LEVELS 4
 #define POT_VALUES 1024
 
+enum difficulties {
+  EASY = 1,
+  NORMAL,
+  MEDIUM,
+  HARD
+};
+
 static const uint16_t levels_range = POT_VALUES / LEVELS;
 static uint8_t current_difficulty = 0;
-
-uint8_t get_difficulty(const uint16_t value) {
-  uint8_t ret_val;
-  if (value < EASY * levels_range) {
-    ret_val = EASY;
-  }
-  else if (value >= EASY * levels_range && value < NORMAL * levels_range) {
-    ret_val = NORMAL;
-  }
-  else if (value >= NORMAL * levels_range && value < MEDIUM * levels_range) {
-    ret_val = MEDIUM;
-  }
-  else {
-    ret_val = HARD;
-  }
-  return ret_val;
-}
-
-uint8_t get_corresponding_led(const uint8_t difficulty) {
-  uint8_t led;
-  switch(difficulty) {
-    case EASY:
-      led = GAME_LED_1;
-      break;
-    case NORMAL:
-      led = GAME_LED_2;
-      break;
-    case MEDIUM:
-      led = GAME_LED_3;
-      break;
-    case HARD:
-      led = GAME_LED_4;
-      break;
-  }
-  return led;
-}
 
 static char* get_difficulty_name(const uint8_t difficulty_value) {
   char* difficulty_name;
@@ -66,6 +37,23 @@ static char* get_difficulty_name(const uint8_t difficulty_value) {
   return difficulty_name;
 }
 
+uint8_t get_difficulty(const uint16_t value) {
+  uint8_t ret_val;
+  if (value < EASY * levels_range) {
+    ret_val = EASY;
+  }
+  else if (value >= EASY * levels_range && value < NORMAL * levels_range) {
+    ret_val = NORMAL;
+  }
+  else if (value >= NORMAL * levels_range && value < MEDIUM * levels_range) {
+    ret_val = MEDIUM;
+  }
+  else {
+    ret_val = HARD;
+  }
+  return ret_val;
+}
+
 float get_difficulty_factor(const uint8_t difficulty) {
   float factor;
   switch(difficulty) {
@@ -83,6 +71,25 @@ float get_difficulty_factor(const uint8_t difficulty) {
       break;
   }
   return factor;
+}
+
+uint8_t get_corresponding_led(const uint8_t difficulty) {
+  uint8_t led;
+  switch(difficulty) {
+    case EASY:
+      led = GAME_LED_1;
+      break;
+    case NORMAL:
+      led = GAME_LED_2;
+      break;
+    case MEDIUM:
+      led = GAME_LED_3;
+      break;
+    case HARD:
+      led = GAME_LED_4;
+      break;
+  }
+  return led;
 }
 
 void view_difficulties() {
