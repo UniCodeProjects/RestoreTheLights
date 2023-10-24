@@ -1,3 +1,10 @@
+/* 
+ * Restore The Lights - Embedded Systems and Internet-of-Things
+ * 
+ * A.Y. 2023-2024, 10/24/2023
+ * 
+ * Authors: Sofia Cipollone, Raffaele Francesco Marrazzo
+ */
 #include "game_status.h"
 
 void setup() {
