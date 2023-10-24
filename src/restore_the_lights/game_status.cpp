@@ -61,6 +61,7 @@ static void reset_game_variables() {
   num_buttons_pressed = 0;
   is_pressing_started = false;
   reset_score();
+  reset_game_difficulty();
   prev_ms = millis();
   enableInterrupt(BUTTON_1, start_game, RISING);
 }
