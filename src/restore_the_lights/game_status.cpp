@@ -24,18 +24,23 @@ static status current_status = WAITING;
 const int game_leds[NUM_GAME_LEDS] = {GAME_LED_1, GAME_LED_2, GAME_LED_3, GAME_LED_4};
 const int buttons[NUM_BUTTONS] = {BUTTON_1, BUTTON_2, BUTTON_3, BUTTON_4};
 
+/* A factor which depends on the difficulty. At the beginning of each round t_btn and t_led 
+ * are multiplied by this value.
+ */
 float game_factor;
 // The leds' turning on delta time.
 unsigned long t_led = INIT_T_LED_VAL;
 // The available delta time to press the buttons.
 unsigned long t_btn = INIT_T_BTN_VAL;
 
+// The buttons pressed by the user in the current round. They are ordered chronologically
 uint8_t *user_button_sequence;
+// The number of buttons pressed by the user in the current round
 uint8_t num_buttons_pressed;
 static uint8_t *correct_button_sequence;
 static bool is_pressing_started;
 static unsigned long prev_ms = 0;
-unsigned long start_level_time = 0;
+static unsigned long start_level_time = 0;
 
 static void choose_difficulty() {
   uint8_t chosen_difficulty = get_chosen_difficulty();
@@ -71,6 +76,33 @@ static void reset_game_variables_for_next_level() {
   user_button_sequence = (uint8_t *) malloc(NUM_BUTTONS * sizeof(uint8_t));
   num_buttons_pressed = 0;
   is_pressing_started = false;
+}
+
+static void game_over() {
+  disableInterrupt(BUTTON_1);
+  disableInterrupt(BUTTON_2);
+  detachInterrupt(digitalPinToInterrupt(BUTTON_3));
+  detachInterrupt(digitalPinToInterrupt(BUTTON_4));
+  led_on(STATUS_LED);
+  delay(1000);
+  led_off(STATUS_LED);
+  for (uint8_t i = 0; i < NUM_GAME_LEDS; i++) {
+    led_off(game_leds[i]);
+  }
+  print_score_to_serial(true);
+  delay(10000);
+  reset_game_variables();
+  enableInterrupt(BUTTON_1, start_game, RISING);
+  update_game_status(WAITING);
+}
+
+static bool are_arrays_equal(uint8_t *a1, uint8_t* a2, uint8_t size) {
+  for (uint8_t i = 0; i < size; i++) {
+    if (a1[i] != a2[i]) {
+      return false;
+    }
+  }
+  return true;
 }
 
 void game_setup() {
@@ -137,24 +169,6 @@ void leds_on() {
   update_game_status(PRESSING);
 }
 
-static void game_over() {
-  disableInterrupt(BUTTON_1);
-  disableInterrupt(BUTTON_2);
-  detachInterrupt(digitalPinToInterrupt(BUTTON_3));
-  detachInterrupt(digitalPinToInterrupt(BUTTON_4));
-  led_on(STATUS_LED);
-  delay(1000);
-  led_off(STATUS_LED);
-  for (uint8_t i = 0; i < NUM_GAME_LEDS; i++) {
-    led_off(game_leds[i]);
-  }
-  print_score_to_serial(true);
-  delay(10000);
-  reset_game_variables();
-  enableInterrupt(BUTTON_1, start_game, RISING);
-  update_game_status(WAITING);
-}
-
 void pressing() {
   if (!is_pressing_started) {
     Serial.println("pressing initialization");
@@ -179,15 +193,6 @@ void pressing() {
       update_game_status(GAME_END);
     }
   }
-}
-
-static bool are_arrays_equal(uint8_t *a1, uint8_t* a2, uint8_t size) {
-  for (uint8_t i = 0; i < size; i++) {
-    if (a1[i] != a2[i]) {
-      return false;
-    }
-  }
-  return true;
 }
 
 void game_end() {
