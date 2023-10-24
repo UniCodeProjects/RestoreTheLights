@@ -36,7 +36,7 @@ uint8_t *user_button_sequence;
 uint8_t num_buttons_pressed;
 static bool is_pressing_started;
 static unsigned long prev_ms = 0;
-unsigned long last_button_press = 0;
+unsigned long start_level_time = 0;
 
 static void choose_difficulty() {
   uint8_t chosen_difficulty = get_chosen_difficulty();
@@ -164,7 +164,7 @@ void pressing() {
     attachInterrupt(digitalPinToInterrupt(BUTTON_3), button3_push, RISING);
     attachInterrupt(digitalPinToInterrupt(BUTTON_4), button4_push, RISING);
     is_pressing_started = true;
-    last_button_press = millis();
+    start_level_time = millis();
   }
 
   if (num_buttons_pressed == NUM_BUTTONS) {
@@ -174,7 +174,7 @@ void pressing() {
     detachInterrupt(digitalPinToInterrupt(BUTTON_4));
     update_game_status(GAME_END);
   } else {
-    if (millis() - last_button_press >= t_btn) {
+    if (millis() - start_level_time >= t_btn) {
       update_game_status(GAME_END);
     }
   }
